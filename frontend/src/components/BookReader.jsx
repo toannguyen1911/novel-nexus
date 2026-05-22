@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, Settings, ChevronLeft, ChevronRight, ArrowLeft, Trash2 } from 'lucide-react';
 import { useDebounce } from '../hooks/useDebounce';
+import { API_BASE } from '../config';
 
 export default function BookReader({ 
   story, 
@@ -38,7 +39,7 @@ export default function BookReader({
     let isMounted = true;
     setLoadingContent(true);
 
-    fetch(`/api/chapters/${activeChapter.id}`)
+    fetch(`${API_BASE}/api/chapters/${activeChapter.id}`)
       .then(res => {
         if (!res.ok) throw new Error("Không thể tải nội dung chương");
         return res.json();

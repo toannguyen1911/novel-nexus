@@ -3,6 +3,8 @@ import { Plus, BookOpen, Trash2, Library, BookCheck, ArrowRight, Settings, Uploa
 import NovelReader from './components/NovelReader';
 import BookReader from './components/BookReader';
 import SettingsModal from './components/SettingsModal';
+import { API_BASE } from './config';
+
 
 export default function App() {
   const [stories, setStories] = useState([]);
@@ -67,7 +69,7 @@ export default function App() {
     if (storyId) {
       try {
         if (!currentDetails || currentDetails.id !== storyId) {
-          const res = await fetch(`/api/stories/${storyId}`);
+          const res = await fetch(`${API_BASE}/api/stories/${storyId}`);
           if (res.ok) {
             const details = await res.json();
             setSelectedStory(details);
@@ -129,7 +131,7 @@ export default function App() {
 
   const fetchStories = async () => {
     try {
-      const res = await fetch('/api/stories/');
+      const res = await fetch(`${API_BASE}/api/stories/`);
       if (res.ok) {
         const data = await res.json();
         setStories(data);
@@ -157,7 +159,7 @@ export default function App() {
     }
 
     try {
-      const res = await fetch('/api/stories/upload', {
+      const res = await fetch(`${API_BASE}/api/stories/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -209,7 +211,7 @@ export default function App() {
     formData.append('story_id', storyId);
 
     try {
-      const res = await fetch('/api/stories/upload', {
+      const res = await fetch(`${API_BASE}/api/stories/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -236,7 +238,7 @@ export default function App() {
     if (!confirm("Bạn có chắc chắn muốn xóa sách/truyện này khỏi thư viện?")) return;
 
     try {
-      const res = await fetch(`/api/stories/${storyId}`, {
+      const res = await fetch(`${API_BASE}/api/stories/${storyId}`, {
         method: 'DELETE',
       });
       if (res.ok) {
@@ -262,7 +264,7 @@ export default function App() {
     }
 
     try {
-      const res = await fetch(`/api/stories/${storyId}`, {
+      const res = await fetch(`${API_BASE}/api/stories/${storyId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -291,12 +293,12 @@ export default function App() {
   const handleDeleteChapter = async (chapterId) => {
     if (!selectedStory) return;
     try {
-      const res = await fetch(`/api/chapters/${chapterId}`, {
+      const res = await fetch(`${API_BASE}/api/chapters/${chapterId}`, {
         method: 'DELETE',
       });
       if (res.ok) {
         // Reload story details to update chapter list and progress
-        const updatedRes = await fetch(`/api/stories/${selectedStory.id}`);
+        const updatedRes = await fetch(`${API_BASE}/api/stories/${selectedStory.id}`);
         if (updatedRes.ok) {
           const details = await updatedRes.json();
           setSelectedStoryDetails(details);
@@ -326,7 +328,7 @@ export default function App() {
   const handleSaveProgress = async (chapterId, scrollRatio) => {
     if (!selectedStory) return;
     try {
-      await fetch(`/api/progress/${selectedStory.id}`, {
+      await fetch(`${API_BASE}/api/progress/${selectedStory.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -488,7 +490,7 @@ export default function App() {
                 <div className="relative w-16 h-22 rounded-xl overflow-hidden bg-zinc-800 border border-zinc-700/50 flex-shrink-0 shadow-sm flex items-center justify-center">
                   {story.cover_path ? (
                     <img
-                      src={story.cover_path}
+                      src={story.cover_path.startsWith('http') ? story.cover_path : `${API_BASE}${story.cover_path}`}
                       alt={story.title}
                       className="w-full h-full object-cover"
                     />
