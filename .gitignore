@@ -1,0 +1,35 @@
+# Python Virtual Environments
+venv/
+.venv/
+ENV/
+env/
+
+# Python compiled files & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases (SQLite local)
+*.db
+*.sqlite3
+
+# Uploads (Tránh đẩy truyện bạn upload test lên git)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Node.js dependencies & builds
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Documentation
+docs/
+
