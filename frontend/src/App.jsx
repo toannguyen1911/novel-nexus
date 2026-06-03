@@ -10,7 +10,15 @@ export default function App() {
   const [stories, setStories] = useState([]);
   const [selectedStory, setSelectedStory] = useState(null);
   const [selectedStoryDetails, setSelectedStoryDetails] = useState(null);
-  const [view, setView] = useState('library'); // 'library' | 'reader'
+  const [view, setView] = useState(() => {
+    const path = window.location.pathname;
+    const storyChapterRegex = /^\/(\d+)\/(\d+)$/;
+    const storyRegex = /^\/(\d+)$/;
+    if (path.match(storyChapterRegex) || path.match(storyRegex)) {
+      return 'reader';
+    }
+    return 'library';
+  });
   const [activeChapterId, setActiveChapterId] = useState(null);
 
   // Settings State
@@ -595,6 +603,14 @@ export default function App() {
               onDeleteChapter={handleDeleteChapter}
             />
           )}
+        </div>
+      )}
+
+      {/* Reader View Loading State */}
+      {view === 'reader' && !selectedStoryDetails && (
+        <div className="flex flex-col items-center justify-center h-screen bg-zinc-950 text-zinc-400">
+          <div className="w-8 h-8 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mb-3" />
+          <p className="text-sm font-medium">Đang tải nội dung sách...</p>
         </div>
       )}
 
