@@ -81,6 +81,11 @@ def upload_story(
             content_str = decode_bytes(content_bytes)
             chapters_data = parse_txt(content_str)
             
+            # If the TXT file has no internal chapter headings, fallback to the filename as chapter title
+            if len(chapters_data) == 1 and chapters_data[0]["title"] == "Introduction / Prologue":
+                filename_without_ext = os.path.splitext(filename)[0]
+                chapters_data[0]["title"] = filename_without_ext
+            
         elif file_type == "epub":
             # Parse EPUB
             parsed_title, chapters_data, cover_bytes = parse_epub(saved_file_path)

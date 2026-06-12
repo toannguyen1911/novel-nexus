@@ -3,6 +3,7 @@ import { Plus, BookOpen, Trash2, Library, BookCheck, ArrowRight, Settings, Uploa
 import NovelReader from './components/NovelReader';
 import BookReader from './components/BookReader';
 import SettingsModal from './components/SettingsModal';
+import BulkUploadModal from './components/BulkUploadModal';
 import { API_BASE } from './config';
 
 
@@ -36,6 +37,8 @@ export default function App() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [bulkUploadFiles, setBulkUploadFiles] = useState([]);
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
 
   // Sync settings to localstorage
   useEffect(() => {
@@ -190,9 +193,12 @@ export default function App() {
   };
 
   const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      await uploadFile(file);
+    const files = Array.from(e.target.files);
+    if (files.length === 1) {
+      await uploadFile(files[0]);
+    } else if (files.length > 1) {
+      setBulkUploadFiles(files);
+      setIsBulkUploadOpen(true);
     }
     e.target.value = ''; // Reset input
   };
@@ -202,9 +208,14 @@ export default function App() {
     e.stopPropagation();
     setIsDragging(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      await uploadFile(file);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length === 1) {
+        await uploadFile(files[0]);
+      } else if (files.length > 1) {
+        setBulkUploadFiles(files);
+        setIsBulkUploadOpen(true);
+      }
     }
   };
   const handleAppendUpload = async (storyId, e) => {
@@ -438,6 +449,7 @@ export default function App() {
               <input
                 type="file"
                 accept=".txt,.epub"
+                multiple
                 onChange={handleUpload}
                 className="hidden"
                 disabled={uploading}
@@ -465,6 +477,7 @@ export default function App() {
               <input
                 type="file"
                 accept=".txt,.epub"
+                multiple
                 onChange={handleUpload}
                 className="hidden"
                 disabled={uploading}
@@ -620,6 +633,22 @@ export default function App() {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdateSettings={handleUpdateSettings}
+      />
+
+      {/* Bulk Upload Modal */}
+      <BulkUploadModal
+        isOpen={isBulkUploadOpen}
+        onClose={() => {
+          setIsBulkUploadOpen(false);
+          setBulkUploadFiles([]);
+        }}
+        files={bulkUploadFiles}
+        onUploadComplete={async (lastStory) => {
+          await fetchStories();
+          if (lastStory) {
+            handleOpenStory(lastStory);
+          }
+        }}
       />
 
     </div>
